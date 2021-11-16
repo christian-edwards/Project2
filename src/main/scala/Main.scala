@@ -28,6 +28,30 @@ object Main {
     spark.sql("LOAD DATA LOCAL INPATH 'Inputs/loginCredentials.txt' INTO TABLE loginDB")
     //spark.sql("SELECT * FROM loginDB").show()
 
+
+    def adminMenu(): Unit ={//TODO: Add later, this will be a menu you can access as an ADMIN from the loginMenu
+
+    }
+
+    def loginMenu(username:String,role:String): Unit ={//The menu the user has when logged in.
+      while(true){
+        println(role+": "+username)
+        println("Please select 1 to log in or 2 to TEST. 0 to log out.")
+        var j = scanner.nextLine()
+        j match {
+          case "1" =>
+            println("Test 1")
+          case "2" =>
+            println("Test 2")
+          case "0" =>
+            println("Logging out...\n")
+            return
+          case default =>
+            println("ERROR: (Incorrect Input)")
+        }
+      }
+    }
+
     def login(): String = { //Prompts the user to log in. If their data matches a record in the loginDB they are logged in.
       print("Username: ")
       var user = scanner.nextLine()
@@ -35,7 +59,15 @@ object Main {
       var password = scanner.nextLine()
       val userDF = spark.sql("SELECT * FROM loginDB WHERE username = '"+ user +"' AND password = '"+password+"';")
       if (userDF.count() == 1){
-        println("Logging in as " + user)
+        val roles = userDF.select("role").collect().map(_.getString(0)).mkString("")
+        if(roles == "ADMIN"){
+          println("Logging in as ADMIN: " + user)
+          loginMenu(user,roles)
+        } else {
+          println("Logging in as USER: " + user)
+          loginMenu(user,roles)
+        }
+
       } else {
         println("ERROR: (Incorrect Login credentials)")
       }
@@ -56,7 +88,8 @@ object Main {
         if(password==passwordConfirm){
           spark.sql("INSERT INTO loginDB(username,password,role) VALUES('"+user+"','"+password+"','USER')")
           //spark.sql("SELECT * FROM loginDB").show()
-          println("User created successfully... logging in as "+user)
+          println("User created successfully... logging in as USER: "+user)
+          loginMenu(user,"USER")
           return user
         } else {
           println("ERROR: (Password mismatch)")
@@ -75,9 +108,9 @@ object Main {
       var i = scanner.nextLine()
       i match {
         case "1" =>
-          currentUser = login() //Attempt to log in
+          login() //Attempt to log in
         case "2" =>
-          currentUser = createUser() //Attempt to create a user and log in
+          createUser() //Attempt to create a user and log in
         case "0" =>
           println("Exiting...") //Exit program and close spark
           spark.stop()
