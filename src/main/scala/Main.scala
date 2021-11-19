@@ -2,6 +2,8 @@ import org.apache.spark.{SparkConf, SparkContext}
 import java.util.{InputMismatchException, Scanner}
 //import org.apache.spark.sql._
 import org.apache.spark.sql.SparkSession
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
 
 object Main {
 
@@ -11,8 +13,10 @@ object Main {
 
 
   def main(args: Array[String]): Unit = {
-    System.setProperty("hadoop.home.dir", "C:\\hadoop")//Edit this to work on your PC.
+    System.setProperty("hadoop.home.dir", "C:\\hadoop")//TODO Edit this to work on your PC.
     val scanner = new Scanner(System.in)
+    //Logger.getLogger("org").setLevel(Level.OFF)//TODO Uncomment these to suppress INFO in output.
+    //Logger.getLogger("akka").setLevel(Level.OFF)
     val spark = SparkSession
       .builder
       .appName("Project2")
@@ -21,12 +25,18 @@ object Main {
       .getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
+    //val countryCodeTable = new countryCode(spark)
+    //val GDPDataTable = new GdpData(spark)
+    //val LifeExpectData = new LifeExpectData(spark)
+    val loginCredentialsTable = new loginCredentialsData(spark)
+
     spark.sql("CREATE DATABASE IF NOT EXISTS project2DB")
     spark.sql("USE project2DB")
-    spark.sql("DROP TABLE IF EXISTS loginDB")
-    spark.sql("CREATE TABLE IF NOT EXISTS loginDB(username varchar(255) ,password varchar(255),role varchar(255)) row format delimited fields terminated by ','")
-    spark.sql("LOAD DATA LOCAL INPATH 'Inputs/loginCredentials.txt' INTO TABLE loginDB")
-    //spark.sql("SELECT * FROM loginDB").show()
+
+    loginCredentialsTable.createTable()
+    //countryCodeTable.createTable()
+    //GDPDataTable.createTable()
+    //LifeExpectData.createTable()
 
 
     def adminMenu(): Unit ={//TODO: Add later, this will be a menu you can access as an ADMIN from the loginMenu
@@ -36,7 +46,7 @@ object Main {
     def loginMenu(username:String,role:String): Unit ={//The menu the user has when logged in.
       while(true){
         println(role+": "+username)
-        println("Please select 1 to log in or 2 to TEST. 0 to log out.")
+        println("Please select 1 to TEST or 2 to TEST. 0 to log out.")
         var j = scanner.nextLine()
         j match {
           case "1" =>
