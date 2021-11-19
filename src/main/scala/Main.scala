@@ -112,7 +112,6 @@ object Main {
     var currentUser =  ""
     var userRole = ""
 
-
     while(true){
       println("Please select 1 to log in or 2 to create an account. 0 to exit.")
       var i = scanner.nextLine()
