@@ -25,23 +25,30 @@ object Main {
       .getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    //val countryCodeTable = new countryCode(spark)
-    //val GDPDataTable = new GdpData(spark)
-    //val LifeExpectData = new LifeExpectData(spark)
+    val countryCodeTable = new countryCode(spark)
+    val GDPDataTable = new GdpData(spark)
+    val LifeExpectData = new LifeExpectData(spark)
     val loginCredentialsTable = new loginCredentialsData(spark)
+    val pharmSpendingDataTable = new  PharmSpendingData(spark)
+
+    val combinedTableData = new combinedtable(spark)
+
 
     spark.sql("CREATE DATABASE IF NOT EXISTS project2DB")
     spark.sql("USE project2DB")
 
     loginCredentialsTable.createTable()
-    //countryCodeTable.createTable()
-    //GDPDataTable.createTable()
-    //LifeExpectData.createTable()
+    countryCodeTable.createTable()
+    GDPDataTable.createTable()
+    LifeExpectData.createTable()
+    pharmSpendingDataTable.createTable()
+    combinedTableData.createTable()
 
+    val queries = new Queries(spark)
 
     def adminMenu(): Unit ={//TODO: Add later, this will be a menu you can access as an ADMIN from the loginMenu
       while(true){
-        println("ADMIN CONSOLE: Please select 1 - 3 to TEST or 0 to return to user menu.")
+        println("ADMIN CONSOLE: Please select 1 - 3 to view ADMIN commands or 0 to return to USER menu.")
         var m = scanner.nextLine()
         m match {
           case "1" =>
@@ -62,20 +69,29 @@ object Main {
     def loginMenu(username:String,role:String): Unit ={//The menu the user has when logged in.
       while(true){
         println(role+": "+username)
-        println("Please select 1 - 5 to select a query or 0 to log out.")
+        println("Please select 1 - 6 to select a query or 0 to log out.")
+        if(role == "ADMIN"){println("Select 7 to open ADMIN console.")}
         var j = scanner.nextLine()
         j match {
           case "1" =>
             println("Query 1: What is the country status, mortality rate and life expectancy of all countries?")
+            queries.query1()
           case "2" =>
             println("Query 2: What are some relevant details about a selected country?")
+            queries.query2()
           case "3" =>
             println("Query 3: What is the GDP vs Healthcare expenditure per country?")
+            queries.query3()
           case "4" =>
             println("Query 4: What country has the highest Healthcare expenditure compared to life expectancy and mortality rate?")
+            queries.query4()
           case "5" =>
             println("Query 5: Average Healthcare across all countries based on development status?")
+            queries.query5()
           case "6" =>
+            println("Query 6: Do countries with a higher GDP spend more in pharmaceuticals for their population?")
+            queries.query6()
+          case "7" =>
             if(role =="ADMIN"){adminMenu()}
             else{println("ERROR: (Incorrect Input)")}
           case "0" =>

@@ -6,7 +6,7 @@ class GdpData(spark:SparkSession) {
   def createTable() = {
 
     //gets the file from resources folder
-    val filePath="src/main/resources/gpdTranspose.csv"
+    val filePath="src/main/resources/World_Development_Indicators_Life_Expectancy.csv"
     //val filePath="Baby_Names__Beginning_2007.csv"
 
     //creates a dataframe
