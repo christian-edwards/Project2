@@ -40,19 +40,44 @@ object Main {
 
 
     def adminMenu(): Unit ={//TODO: Add later, this will be a menu you can access as an ADMIN from the loginMenu
-
+      while(true){
+        println("ADMIN CONSOLE: Please select 1 - 3 to TEST or 0 to return to user menu.")
+        var m = scanner.nextLine()
+        m match {
+          case "1" =>
+          spark.sql("SELECT username,role FROM loginDB").show()
+          case "2" =>
+            println("Making a new ADMIN...")
+            createUser("ADMIN")
+          case "3" =>
+            println("Admin Test 3")
+          case "0" =>
+            println("Returning to user menu...")
+            return
+          case default => println("ERROR: (Incorrect input)")
+        }
+      }
     }
 
     def loginMenu(username:String,role:String): Unit ={//The menu the user has when logged in.
       while(true){
         println(role+": "+username)
-        println("Please select 1 to TEST or 2 to TEST. 0 to log out.")
+        println("Please select 1 - 5 to select a query or 0 to log out.")
         var j = scanner.nextLine()
         j match {
           case "1" =>
-            println("Test 1")
+            println("Query 1: What is the country status, mortality rate and life expectancy of all countries?")
           case "2" =>
-            println("Test 2")
+            println("Query 2: What are some relevant details about a selected country?")
+          case "3" =>
+            println("Query 3: What is the GDP vs Healthcare expenditure per country?")
+          case "4" =>
+            println("Query 4: What country has the highest Healthcare expenditure compared to life expectancy and mortality rate?")
+          case "5" =>
+            println("Query 5: Average Healthcare across all countries based on development status?")
+          case "6" =>
+            if(role =="ADMIN"){adminMenu()}
+            else{println("ERROR: (Incorrect Input)")}
           case "0" =>
             println("Logging out...\n")
             return
@@ -84,7 +109,7 @@ object Main {
       return user
     }
 
-    def createUser():String ={ //Prompts the user to create an account. Checks the table for conflicts in username and inserts new user if none are found.
+    def createUser(role:String):String ={ //Prompts the user to create an account. Checks the table for conflicts in username and inserts new user if none are found.
       print("Desired username: ")
       var user = scanner.nextLine()
       if(spark.sql("SELECT * FROM loginDB WHERE username ='"+user+"';").count() >0){
@@ -96,10 +121,14 @@ object Main {
         print("Confirm Password: ")
         val passwordConfirm = scanner.nextLine()
         if(password==passwordConfirm){
-          spark.sql("INSERT INTO loginDB(username,password,role) VALUES('"+user+"','"+password+"','USER')")
-          //spark.sql("SELECT * FROM loginDB").show()
-          println("User created successfully... logging in as USER: "+user)
-          loginMenu(user,"USER")
+          loginCredentialsTable.insert(user,password,role)
+          if(role == "USER"){
+            println(role+" created successfully... logging in as "+user)
+            loginMenu(user,role)
+          } else {
+            println("ADMIN "+user+" created successfully.")
+          }
+
           return user
         } else {
           println("ERROR: (Password mismatch)")
@@ -108,6 +137,8 @@ object Main {
       }
       return ""
     }
+
+    spark.sql("SELECT username,role FROM loginDB").show()
 
     var currentUser =  ""
     var userRole = ""
@@ -119,7 +150,7 @@ object Main {
         case "1" =>
           login() //Attempt to log in
         case "2" =>
-          createUser() //Attempt to create a user and log in
+          createUser("USER") //Attempt to create a user and log in
         case "0" =>
           println("Exiting...") //Exit program and close spark
           spark.stop()
