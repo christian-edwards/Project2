@@ -15,8 +15,8 @@ object Main {
   def main(args: Array[String]): Unit = {
     System.setProperty("hadoop.home.dir", "C:\\hadoop")//TODO Edit this to work on your PC.
     val scanner = new Scanner(System.in)
-    //Logger.getLogger("org").setLevel(Level.OFF)//TODO Uncomment these to suppress INFO in output.
-    //Logger.getLogger("akka").setLevel(Level.OFF)
+    Logger.getLogger("org").setLevel(Level.OFF)//TODO Uncomment these to suppress INFO in output.
+    Logger.getLogger("akka").setLevel(Level.OFF)
     val spark = SparkSession
       .builder
       .appName("Project2")
@@ -37,6 +37,7 @@ object Main {
     spark.sql("CREATE DATABASE IF NOT EXISTS project2DB")
     spark.sql("USE project2DB")
 
+    println("Generating tables... ")
     loginCredentialsTable.createTable()
     countryCodeTable.createTable()
     GDPDataTable.createTable()

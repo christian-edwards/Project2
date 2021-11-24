@@ -14,7 +14,7 @@ class Queries(spark:SparkSession) {
   }
 
   def query1(): Unit ={
-    spark.sql("SELECT country,year,adult_mortality,life_expectancy FROM lifeexpectpharmspending").show()
+    spark.sql("SELECT country,year,adult_mortality,life_expectancy FROM lifeexpectpharmspending").show(500)
     //spark.sql("select country,status,avg(gdp) as avg_gdp,avg(gdp_growth) as avg_gdp_growth, avg(pc_healthxp) as avg_pharm_spend,sum(total_spend) as healthcare_spend from lifeexpectpharmspending group by country,status order by country").show()
   }
 
@@ -27,11 +27,11 @@ class Queries(spark:SparkSession) {
   }
 
   def query3(): Unit ={
-    spark.sql("SELECT country,gdp,adult_mortality,pc_healthxp FROM lifeexpectpharmspending").show()
+    spark.sql("SELECT country,gdp,adult_mortality,pc_healthxp FROM lifeexpectpharmspending").show(500)
   }
 
   def query4(): Unit ={
-    spark.sql("SELECT country,pc_healthxp,life_expectancy,adult_mortality FROM lifeexpectpharmspending ORDER BY pc_healthxp DESC").show()
+    spark.sql("SELECT country,pc_healthxp,life_expectancy,adult_mortality FROM lifeexpectpharmspending ORDER BY pc_healthxp DESC, life_expectancy DESC").show(10)
   }
 
   def query5(): Unit ={
