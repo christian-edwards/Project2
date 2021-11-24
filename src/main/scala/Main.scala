@@ -20,7 +20,7 @@ object Main {
     val spark = SparkSession
       .builder
       .appName("Project2")
-      .config("spark.master", "local")
+      .config("spark.master", "local[5]")
       .enableHiveSupport()
       .getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")

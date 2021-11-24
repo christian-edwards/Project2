@@ -21,7 +21,9 @@ class Queries(spark:SparkSession) {
   def query2(): Unit ={
       print("Select a country: ")
       val country = scanner.nextLine()
-      spark.sql("SELECT country,year,adult_mortality,life_expectancy FROM lifeexpectpharmspending WHERE country = '"+country+"'").show()
+    var df = spark.sql("SELECT country,year,adult_mortality,life_expectancy FROM lifeexpectpharmspending")
+    var df2 = df.filter(df("country")===country).cache()
+    df2.show(false)
   }
 
   def query3(): Unit ={
